@@ -1,1 +1,580 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Meta tags  -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+  <title>Edit Profile</title>
+    <link rel="icon" type="image/png" href="../img/about-img.png">
+
+  <!-- CSS Assets -->
+  <link rel="stylesheet" href="../css/app.css">
+
+  <!-- Javascript Assets -->
+  <script src="../js/app.js" defer=""></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="css2?family=Inter:wght@400;500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  <script>
+    /**
+     * THIS SCRIPT REQUIRED FOR PREVENT FLICKERING IN SOME BROWSERS
+     */
+    localStorage.getItem("_x_darkMode_on") === "true" &&
+    document.documentElement.classList.add("dark");
+  </script>
+
+  <style>
+    .pad{
+      padding:3rem 4rem 0 4rem;
+    }
+  </style>
+</head>
+
+<body x-data="" class="is-header-blur" x-bind="$store.global.documentBody">
+<!-- App preloader-->
+<div class="app-preloader fixed z-50 grid h-full w-full place-content-center bg-slate-50 dark:bg-navy-900">
+  <div class="app-preloader-inner relative inline-block size-48"></div>
+</div>
+
+<!-- Page Wrapper -->
+<div id="root" class="min-h-100vh flex grow bg-slate-50 dark:bg-navy-900" x-cloak="">
+
+  <!-- Sidebar -->
+  <div class="sidebar print:hidden">
+
+    <!-- Main Sidebar -->
+    <div class="main-sidebar">
+      <div class="flex h-full w-full flex-col items-center border-r border-slate-150 bg-white dark:border-navy-700 dark:bg-navy-800">
+
+        <!-- Application Logo -->
+        <div class="flex pt-4">
+
+          <!-- Profile -->
+          <div x-data="usePopper({placement:'right-end',offset:12})" @click.outside="isShowPopper && (isShowPopper = false)" class="flex">
+            <button @click="isShowPopper = !isShowPopper" x-ref="popperRef" class="avatar size-12">
+              <img class="rounded-full" src="../images/avatar/avatar-12.jpg" alt="avatar">
+              <span class="absolute right-0 size-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"></span>
+            </button>
+
+            <div :class="isShowPopper && 'show'" class="popper-root fixed" x-ref="popperRoot">
+              <div class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700">
+                <div class="flex items-center space-x-4 rounded-t-lg bg-slate-100 py-5 px-4 dark:bg-navy-800">
+                  <div class="avatar size-14">
+                    <img class="rounded-full" src="../images/avatar/avatar-12.jpg" alt="avatar">
+                  </div>
+                  <div>
+                    <a href="#" class="text-base font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light">
+                      Patrick Dwamena
+                    </a>
+                    <p class="text-xs text-slate-400 dark:text-navy-300">
+                      Admin
+                    </p>
+                  </div>
+
+                </div>
+                <div class="flex flex-col pt-2 pb-5">
+                  <a href="../all_users/homepage.html" class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600">
+                    <div class="flex size-8 items-center justify-center rounded-lg bg-error text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="size-4.5" fill="none" viewbox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 class="font-medium text-slate-700 transition-colors group-hover:text-primary group-focus:text-primary dark:text-navy-100 dark:group-hover:text-accent-light dark:group-focus:text-accent-light">
+                        Home Page
+                      </h2>
+                      <div class="text-xs text-slate-400 line-clamp-1 dark:text-navy-300">
+                        Go to home page
+                      </div>
+                    </div>
+                  </a>
+
+
+                  <div class="mt-3 px-4">
+                    <button class="btn h-9 w-full space-x-2 bg-primary text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                      </svg>
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+          <!-- Main Sections Links -->
+          <div class="is-scrollbar-hidden flex grow flex-col space-y-4 overflow-y-auto pt-6">
+              <!-- Dashboards -->
+            <a href="customer_dashboard.html" class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25" x-tooltip.placement.right="'Dashboards'">
+              <svg class="size-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24">
+                <path fill="currentColor" fill-opacity=".3" d="M5 14.059c0-1.01 0-1.514.222-1.945.221-.43.632-.724 1.453-1.31l4.163-2.974c.56-.4.842-.601 1.162-.601.32 0 .601.2 1.162.601l4.163 2.974c.821.586 1.232.88 1.453 1.31.222.43.222.935.222 1.945V19c0 .943 0 1.414-.293 1.707C18.414 21 17.943 21 17 21H7c-.943 0-1.414 0-1.707-.293C5 20.414 5 19.943 5 19v-4.94Z"></path>
+                <path fill="currentColor" d="M3 12.387c0 .267 0 .4.084.441.084.041.19-.04.4-.204l7.288-5.669c.59-.459.885-.688 1.228-.688.343 0 .638.23 1.228.688l7.288 5.669c.21.163.316.245.4.204.084-.04.084-.174.084-.441v-.409c0-.48 0-.72-.102-.928-.101-.208-.291-.355-.67-.65l-7-5.445c-.59-.459-.885-.688-1.228-.688-.343 0-.638.23-1.228.688l-7 5.445c-.379.295-.569.442-.67.65-.102.208-.102.448-.102.928v.409Z"></path>
+                <path fill="currentColor" d="M11.5 15.5h1A1.5 1.5 0 0 1 14 17v3.5h-4V17a1.5 1.5 0 0 1 1.5-1.5Z"></path>
+                <path fill="currentColor" d="M17.5 5h-1a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5Z"></path>
+              </svg>
+            </a>
+
+            <!-- My Bookings -->
+            <a href="customer_bookings.html" class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25" x-tooltip.placement.right="'My Bookings'">
+              <svg class="size-7" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-opacity="0.5" d="M14.2498 16C14.2498 17.5487 13.576 18.9487 12.4998 19.9025C11.5723 20.7425 10.3473 21.25 8.99976 21.25C6.10351 21.25 3.74976 18.8962 3.74976 16C3.74976 13.585 5.39476 11.5375 7.61726 10.9337C8.22101 12.4562 9.51601 13.6287 11.1173 14.0662C11.5548 14.1887 12.0185 14.25 12.4998 14.25C12.981 14.25 13.4448 14.1887 13.8823 14.0662C14.1185 14.6612 14.2498 15.3175 14.2498 16Z" fill="currentColor"></path>
+                <path d="M17.75 9.00012C17.75 9.68262 17.6187 10.3389 17.3825 10.9339C16.7787 12.4564 15.4837 13.6289 13.8825 14.0664C13.445 14.1889 12.9813 14.2501 12.5 14.2501C12.0187 14.2501 11.555 14.1889 11.1175 14.0664C9.51625 13.6289 8.22125 12.4564 7.6175 10.9339C7.38125 10.3389 7.25 9.68262 7.25 9.00012C7.25 6.10387 9.60375 3.75012 12.5 3.75012C15.3962 3.75012 17.75 6.10387 17.75 9.00012Z" fill="currentColor"></path>
+                <path fill-opacity="0.3" d="M21.25 16C21.25 18.8962 18.8962 21.25 16 21.25C14.6525 21.25 13.4275 20.7425 12.5 19.9025C13.5763 18.9487 14.25 17.5487 14.25 16C14.25 15.3175 14.1187 14.6612 13.8825 14.0662C15.4837 13.6287 16.7787 12.4562 17.3825 10.9337C19.605 11.5375 21.25 13.585 21.25 16Z" fill="currentColor"></path>
+              </svg>
+            </a>
+
+            <!-- Submit Forms -->
+            <a href="customer_forms.html" class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25" x-tooltip.placement.right="'Submit Forms'">
+              <svg class="size-7" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.3111 14.75H5.03356C3.36523 14.75 2.30189 12.9625 3.10856 11.4958L5.24439 7.60911L7.24273 3.96995C8.07689 2.45745 10.2586 2.45745 11.0927 3.96995L13.1002 7.60911L14.0627 9.35995L15.2361 11.4958C16.0427 12.9625 14.9794 14.75 13.3111 14.75Z" fill="currentColor"></path>
+                <path fill-opacity="0.3" d="M21.1667 15.2083C21.1667 18.4992 18.4992 21.1667 15.2083 21.1667C11.9175 21.1667 9.25 18.4992 9.25 15.2083C9.25 15.0525 9.25917 14.9058 9.26833 14.75H13.3108C14.9792 14.75 16.0425 12.9625 15.2358 11.4958L14.0625 9.36C14.4292 9.28666 14.8142 9.25 15.2083 9.25C18.4992 9.25 21.1667 11.9175 21.1667 15.2083Z" fill="currentColor"></path>
+              </svg>
+            </a>
+
+              <!-- Chat -->
+              <a href="customer_chat.html"
+                 class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                 x-tooltip.placement.right="'Chat'">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       class="size-7"
+                       fill="none"
+                       viewBox="0 0 24 24"
+                       stroke="currentColor"
+                       stroke-width="2">
+                      <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M8 10h.01M12 10h.01M16 10h.01
+             M21 12c0 4.418-4.03 8-9 8a9.009 9.009 0 01-5-1.563
+             l-4.223.885.898-4.21A8.962 8.962 0 013 12
+             c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+              </a>
+
+          </div>
+
+        <!-- Bottom Links -->
+        <div class="flex flex-col items-center space-y-3 py-3">
+          <!-- Settings -->
+          <a href="customer_edit_profile.html" class="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-navy-600 dark:text-accent-light dark:hover:bg-navy-450 dark:focus:bg-navy-450 dark:active:bg-navy-450/90">
+            <svg class="size-7" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-opacity="0.3" fill="currentColor" d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"></path>
+              <path fill="currentColor" d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Panel -->
+    <div class="sidebar-panel">
+      <div class="flex h-full grow flex-col bg-white pl-[var(--main-sidebar-width)] dark:bg-navy-750">
+        <!-- Sidebar Panel Header -->
+        <div class="flex h-18 w-full items-center justify-between pl-4 pr-1">
+          <p class="text-base tracking-wider text-slate-800 dark:text-navy-100">
+            Edit Profile
+          </p>
+          <button @click="$store.global.isSidebarExpanded = false" class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sidebar Panel Body -->
+        <div x-data="{expandedItem:null}" class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6" x-init="$el._x_simplebar = new SimpleBar($el);">
+          <ul class="flex flex-1 flex-col px-4 font-inter">
+            <li>
+              <a x-data="navLink" :class="isActive ? 'font-medium text-primary dark:text-accent-light' : 'text-slate-600 hover:text-slate-900 dark:text-navy-200 dark:hover:text-navy-50'" class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out">
+                Edit your profile and login details.<br>
+                <br>Note: Deleting your account will permanently remove all your bookings and personal information.
+              </a>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Header Wrapper-->
+  <nav class="header before:bg-white dark:before:bg-navy-750 print:hidden">
+    <!-- App Header  -->
+    <div class="header-container relative flex w-full bg-white dark:bg-navy-750 print:hidden">
+      <!-- Header Items -->
+      <div class="flex w-full items-center justify-between">
+
+        <!-- Left: Sidebar Toggle Button -->
+        <div class="size-7">
+          <button class="menu-toggle ml-0.5 flex size-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80" :class="$store.global.isSidebarExpanded && 'active'" @click="$store.global.isSidebarExpanded = !$store.global.isSidebarExpanded">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+
+        <!-- Right: Header buttons -->
+        <div class="-mr-1.5 flex items-center space-x-2">
+
+
+
+          <!-- Dark Mode Toggle -->
+          <button @click="$store.global.isDarkModeEnabled = !$store.global.isDarkModeEnabled" class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+            <svg x-show="$store.global.isDarkModeEnabled" x-transition:enter="transition-transform duration-200 ease-out absolute origin-top" x-transition:enter-start="scale-75" x-transition:enter-end="scale-100 static" class="size-6 text-amber-400" fill="currentColor" viewbox="0 0 24 24">
+              <path d="M11.75 3.412a.818.818 0 01-.07.917 6.332 6.332 0 00-1.4 3.971c0 3.564 2.98 6.494 6.706 6.494a6.86 6.86 0 002.856-.617.818.818 0 011.1 1.047C19.593 18.614 16.218 21 12.283 21 7.18 21 3 16.973 3 11.956c0-4.563 3.46-8.31 7.925-8.948a.818.818 0 01.826.404z"></path>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" x-show="!$store.global.isDarkModeEnabled" x-transition:enter="transition-transform duration-200 ease-out absolute origin-top" x-transition:enter-start="scale-75" x-transition:enter-end="scale-100 static" class="size-6 text-amber-400" viewbox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+
+          <!-- Monochrome Mode Toggle -->
+          <button @click="$store.global.isMonochromeModeEnabled = !$store.global.isMonochromeModeEnabled" class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+            <i class="fa-solid fa-palette bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-lg font-semibold text-transparent"></i>
+          </button>
+
+          <!-- Right Sidebar home page icon -->
+          <button
+                  @click="window.location.href = '../all_users/homepage.html'; $store.global.isRightSidebarExpanded = true"
+                  class="btn size-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5.5 text-slate-500 dark:text-navy-100" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+            </svg>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content w-full px-[var(--margin-x)] pb-8">
+    <div x-data="{
+            user: {
+                firstName: 'Customer',
+                lastName: 'Account',
+                email: 'john.doe@example.com',
+                phone: '024-123-4567',
+                dob: '1990-05-15',
+                address: '123 Innovation Drive, Accra',
+                role: 'Customer',
+                avatar: '../images/avatar/avatar-3.jpg',
+                avatarPreview: null
+            },
+            password: {
+                current: '',
+                new: '',
+                confirm: ''
+            },
+            correctPassword: 'password123', // Demo purpose: the user's actual current password
+            showCurrentPass: false,
+            showNewPass: false,
+            showConfirmPass: false,
+            deleteConfirmation: '',
+            showSuccessModal: false,
+            showErrorModal: false,
+            showDeleteConfirmModal: false, // New state for the confirmation modal
+            modalTitle: '',
+            modalText: '',
+            handleAvatarUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.user.avatarPreview = URL.createObjectURL(file);
+                }
+            },
+            handleSuccess(title, text) {
+                this.modalTitle = title;
+                this.modalText = text;
+                this.showSuccessModal = true;
+            },
+            handleError(title, text) {
+                this.modalTitle = title;
+                this.modalText = text;
+                this.showErrorModal = true;
+            },
+            changePassword() {
+                if (this.password.current !== this.correctPassword) {
+                    this.handleError('Password Mismatch', 'The current password you entered is incorrect.');
+                    return;
+                }
+                if (!this.password.new || this.password.new !== this.password.confirm) {
+                    this.handleError('Validation Error', 'The new passwords do not match or are empty.');
+                    return;
+                }
+                this.handleSuccess('Password Changed', 'Your password has been updated successfully.');
+                this.password = { current: '', new: '', confirm: '' };
+            },
+            confirmDelete() {
+                this.showDeleteConfirmModal = false;
+                this.handleSuccess('Account Deleted', 'Your account has been permanently deleted.');
+            }
+        }">
+      <div class="flex items-center space-x-4 py-5 lg:py-6">
+        <h2 class="text-xl font-medium text-slate-800 dark:text-navy-50 lg:text-2xl">
+          Edit Profile
+        </h2>
+        <div class="hidden h-full py-1 sm:flex">
+          <div class="h-full w-px bg-slate-300 dark:bg-navy-600"></div>
+        </div>
+        <ul class="hidden flex-wrap items-center space-x-2 sm:flex">
+          <li class="flex items-center space-x-2">
+            <a class="text-primary transition-colors hover:text-primary-focus dark:text-accent-light dark:hover:text-accent" href="#">User</a>
+            <svg x-ignore="" xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </li>
+          <li>Account Settings</li>
+        </ul>
+      </div>
+
+      <div class="grid grid-cols-12 gap-4 sm:gap-5 lg:gap-6">
+        <!-- Left Column: User Details -->
+        <div class="col-span-12 lg:col-span-8">
+          <div class="card">
+            <div class="flex flex-col items-center space-y-4 border-b border-slate-200 p-4 dark:border-navy-500 sm:flex-row sm:justify-between sm:space-y-0 sm:px-5">
+              <div class="flex items-center space-x-4">
+                <div class="avatar size-20">
+                  <img class="mask is-squircle" :src="user.avatarPreview || user.avatar" alt="avatar">
+                </div>
+                <div>
+                  <h3 class="text-xl font-medium text-slate-700 dark:text-navy-100" x-text="`${user.firstName} ${user.lastName}`"></h3>
+                  <p class="text-sm+ text-slate-500 dark:text-navy-300" x-text="user.role"></p>
+                </div>
+              </div>
+              <label class="btn border border-info/30 bg-info/10 font-medium text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25 cursor-pointer">
+                Change Avatar
+                <input id="avatar-upload" type="file" @change="handleAvatarUpload" class="hidden" accept="image/*">
+              </label>
+            </div>
+            <div class="p-4 sm:p-5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label class="block">
+                  <span>First Name</span>
+                  <input x-model="user.firstName" class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2" placeholder="First Name" type="text">
+                </label>
+                <label class="block">
+                  <span>Last Name</span>
+                  <input x-model="user.lastName" class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2" placeholder="Last Name" type="text">
+                </label>
+                <label class="block">
+                  <span>Email Address</span>
+                  <input x-model="user.email" class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2" placeholder="Email Address" type="email">
+                </label>
+                <label class="block">
+                  <span>Phone Number</span>
+                  <input x-model="user.phone" class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2" placeholder="Phone Number" type="text">
+                </label>
+                <label class="block">
+                  <span>Date of Birth</span>
+                  <input x-model="user.dob" class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2" type="date">
+                </label>
+                <label class="block">
+                  <span>Address</span>
+                  <input x-model="user.address" class="form-input mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2" placeholder="User Address" type="text">
+                </label>
+              </div>
+              <div class="my-7 h-px bg-slate-200 dark:bg-navy-500"></div>
+              <div class="flex justify-end space-x-2">
+                <button class="btn border border-warning/30 bg-warning/10 font-medium text-warning hover:bg-warning/20 focus:bg-warning/20 active:bg-warning/25">Cancel</button>
+                <button @click="handleSuccess('Profile Updated', 'Your user details have been saved successfully.')" class="btn border border-primary/30 bg-primary/10 font-medium text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:border-accent-light/30 dark:bg-accent-light/10 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25">Save Changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Security -->
+        <div class="col-span-12 lg:col-span-4">
+          <div class="space-y-4 sm:space-y-5 lg:space-y-6">
+            <!-- Change Password Card -->
+            <div class="card">
+              <div class="border-b border-slate-200 p-4 dark:border-navy-500 sm:px-5">
+                <h3 class="text-base font-medium text-slate-700 dark:text-navy-100">Change Password</h3>
+              </div>
+              <div class="p-4 sm:p-5 space-y-4">
+                <label class="block">
+                  <span>Current Password</span>
+                  <span class="relative mt-1.5 flex">
+                                        <input :type="showCurrentPass ? 'text' : 'password'" x-model="password.current" class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9" placeholder="Current Password">
+                                        <span class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"><i class="fa-solid fa-lock"></i></span>
+                                        <button @click="showCurrentPass = !showCurrentPass" class="absolute right-0 flex h-full w-10 items-center justify-center text-slate-400 hover:text-slate-500">
+                                            <i class="fas" :class="showCurrentPass ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                        </button>
+                                    </span>
+                </label>
+                <label class="block">
+                  <span>New Password</span>
+                  <span class="relative mt-1.5 flex">
+                                        <input :type="showNewPass ? 'text' : 'password'" x-model="password.new" class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9" placeholder="New Password">
+                                        <span class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"><i class="fa-solid fa-lock"></i></span>
+                                        <button @click="showNewPass = !showNewPass" class="absolute right-0 flex h-full w-10 items-center justify-center text-slate-400 hover:text-slate-500">
+                                            <i class="fas" :class="showNewPass ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                        </button>
+                                    </span>
+                </label>
+                <label class="block">
+                  <span>Confirm New Password</span>
+                  <span class="relative mt-1.5 flex">
+                                        <input :type="showConfirmPass ? 'text' : 'password'" x-model="password.confirm" class="form-input peer w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9" placeholder="Confirm Password">
+                                        <span class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent"><i class="fa-solid fa-lock"></i></span>
+                                        <button @click="showConfirmPass = !showConfirmPass" class="absolute right-0 flex h-full w-10 items-center justify-center text-slate-400 hover:text-slate-500">
+                                            <i class="fas" :class="showConfirmPass ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                        </button>
+                                    </span>
+                </label>
+                <button @click="changePassword()" class="btn w-full border border-info/30 bg-info/10 font-medium text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25">
+                  Change Password
+                </button>
+              </div>
+            </div>
+
+            <!-- Delete Account Card -->
+            <div class="card">
+              <div class="border-b border-slate-200 p-4 dark:border-navy-500 sm:px-5">
+                <h3 class="text-base font-medium text-error">Delete Account</h3>
+              </div>
+              <div class="p-4 sm:p-5 space-y-4">
+                <p class="text-sm+">
+                  This action is permanent and cannot be undone. All your data will be erased.
+                </p>
+                <label class="block">
+                  <span>To confirm, type "DELETE"</span>
+                  <textarea x-model="deleteConfirmation" rows="2" class="form-textarea mt-1.5 w-full rounded-lg border border-slate-300 bg-transparent p-2.5"></textarea>
+                </label>
+                <button
+                        @click="showDeleteConfirmModal = true"
+                        :disabled="deleteConfirmation !== 'DELETE'"
+                        class="btn w-full border border-error/30 bg-error/10 font-medium text-error hover:bg-error/20 focus:bg-error/20 active:bg-error/25"
+                        :class="{'opacity-50 cursor-not-allowed': deleteConfirmation !== 'DELETE'}"
+                >
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modals -->
+      <template x-teleport="#x-teleport-target">
+        <div>
+          <!-- Delete Confirmation Modal -->
+          <div
+                  class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5"
+                  x-show="showDeleteConfirmModal"
+                  role="dialog"
+                  @keydown.window.escape="showDeleteConfirmModal = false"
+          >
+            <div
+                    class="absolute inset-0 bg-slate-900/60 backdrop-blur transition-opacity duration-300"
+                    @click="showDeleteConfirmModal = false"
+                    x-show="showDeleteConfirmModal"
+                    x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            ></div>
+            <div
+                    class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5"
+                    x-show="showDeleteConfirmModal"
+                    x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            >
+              <i class="fa-solid fa-triangle-exclamation text-6xl text-warning"></i>
+              <div class="mt-4">
+                <h2 class="text-2xl text-slate-700 dark:text-navy-100">Are you sure?</h2>
+                <p class="mt-2">You are about to delete your account. This action is permanent and cannot be undone.</p>
+                <div class="mt-6 space-x-3">
+                  <button @click="showDeleteConfirmModal = false" class="btn bg-slate-200 font-medium text-slate-700 hover:bg-slate-300">Cancel</button>
+                  <button @click="confirmDelete()" class="btn bg-error font-medium text-white hover:bg-error-focus">Yes, Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Success Modal -->
+          <div
+                  class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5"
+                  x-show="showSuccessModal"
+                  role="dialog"
+                  @keydown.window.escape="showSuccessModal = false"
+          >
+            <div
+                    class="absolute inset-0 bg-slate-900/60 backdrop-blur transition-opacity duration-300"
+                    @click="showSuccessModal = false"
+                    x-show="showSuccessModal"
+                    x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            ></div>
+            <div
+                    class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5"
+                    x-show="showSuccessModal"
+                    x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="inline size-28 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div class="mt-4">
+                <h2 class="text-2xl text-slate-700 dark:text-navy-100" x-text="modalTitle"></h2>
+                <p class="mt-2" x-text="modalText"></p>
+                <button @click="showSuccessModal = false" class="btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Error Modal -->
+          <div
+                  class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5"
+                  x-show="showErrorModal"
+                  role="dialog"
+                  @keydown.window.escape="showErrorModal = false"
+          >
+            <div
+                    class="absolute inset-0 bg-slate-900/60 backdrop-blur transition-opacity duration-300"
+                    @click="showErrorModal = false"
+                    x-show="showErrorModal"
+                    x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            ></div>
+            <div
+                    class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5"
+                    x-show="showErrorModal"
+                    x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="inline size-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div class="mt-4">
+                <h2 class="text-2xl text-slate-700 dark:text-navy-100" x-text="modalTitle"></h2>
+                <p class="mt-2" x-text="modalText"></p>
+                <button @click="showErrorModal = false" class="btn mt-6 bg-error font-medium text-white hover:bg-error-focus focus:bg-error-focus active:bg-error-focus/90">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </main>
+
+  
+</div>
+<!--
+    This is a place for Alpine.js Teleport feature
+    @see https://alpinejs.dev/directives/teleport
+  -->
+<div id="x-teleport-target"></div>
+<script>
+  window.addEventListener("DOMContentLoaded", () => Alpine.start());
+</script>
+</body>
+</html>
 
