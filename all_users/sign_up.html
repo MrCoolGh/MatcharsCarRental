@@ -128,21 +128,7 @@
                     }
 
                     if (!this.terms) {
-                        this.showAlert('You must agree to the privacy policy.', 'error');
-                        return;
-                    }
-
-                    if (this.existingEmails.includes(this.email.toLowerCase())) {
-                        this.showAlert('This email is already registered.', 'error');
-                        return;
-                    }
-
-                    this.showSuccessMessage = true;
-                    // After sign up successful, wait for 3 seconds then redirect to homepage.html
-                    setTimeout(() => {
-                        window.location.href = 'homepage.html';
-                    }, 3000);
-                },
+       
 
                 showAlert(message, type) {
                     this.alertMessage = message;
