@@ -39,7 +39,9 @@
 
 <body x-data="" class="is-header-blur" x-bind="$store.global.documentBody">
 <!-- App preloader-->
-
+<div class="app-preloader fixed z-50 grid h-full w-full place-content-center bg-slate-50 dark:bg-navy-900">
+    <div class="app-preloader-inner relative inline-block size-48"></div>
+</div>
 
     
 <!-- Page Wrapper -->
@@ -128,7 +130,21 @@
                     }
 
                     if (!this.terms) {
-       
+                        this.showAlert('You must agree to the privacy policy.', 'error');
+                        return;
+                    }
+
+                    if (this.existingEmails.includes(this.email.toLowerCase())) {
+                        this.showAlert('This email is already registered.', 'error');
+                        return;
+                    }
+
+                    this.showSuccessMessage = true;
+                    // After sign up successful, wait for 3 seconds then redirect to homepage.html
+                    setTimeout(() => {
+                        window.location.href = 'homepage.html';
+                    }, 3000);
+                },
 
                 showAlert(message, type) {
                     this.alertMessage = message;
