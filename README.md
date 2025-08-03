@@ -34,7 +34,7 @@ The system offers users the ability to view available cars, register, make booki
 | Isabella Baapogma     | Frontend Developer       |
 | Priscilla Mankoe      | UI/UX Designer           |
 | Acquah Stephen         | Backend Developer        |
-| Michael Hodor          | Security Engineer        |
+| Michael Hodor          |Quality Assurance |
 | Edwige Gbassi          | Database Engineer        |
 
 ## 📸 Screenshots
