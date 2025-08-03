@@ -29,7 +29,7 @@ The system offers users the ability to view available cars, register, make booki
 
 | Name                   | Role                     |
 |------------------------|--------------------------|
-| Dwamena Patrick        | FullStack Developer / Project Manager |
+| Patrick Dwamena        | FullStack Developer / Project Manager |
 | Richardson Jerry John | DevOps Engineer          |
 | Isabella Baapogma     | Frontend Developer       |
 | Priscilla Mankoe      | UI/UX Designer           |
