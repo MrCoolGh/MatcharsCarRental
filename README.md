@@ -42,34 +42,28 @@ The system offers users the ability to view available cars, register, make booki
 ### 1. 🏠 Home Page  
 ![Home Page](./screenshots/home.jpg)
 
-### 2. ⚙️ Admin And Customer Dashboard
-![Admin Dashboard](./screenshots/dashboard.jpg)
-
-### 3. 🚘 Car Listings  
+### 2. 🚘 Car Listings  
 ![Car Listings](./screenshots/cars.jpg)
 
-### 4. 📅 Manage Bookings  
+### 3. 📅 Manage Bookings  
 ![Manage Bookings](./screenshots/managebooking.jpg)
 
-### 5. 🧾 My Bookings (User View)  
+### 4. 🧾 My Bookings (User View)  
 ![My Bookings](./screenshots/bookings.jpg)
 
-### 6. 👥 Manage Users  
-![Manage Users](./screenshots/manageuser.jpg)
-
-### 7. 🚘 Manage Cars  
+### 5. 🚘 Manage Cars  
 ![Manage Cars](./screenshots/managecar.jpg)
 
-### 8. 💬 In-App Chat  
+### 6. 💬 In-App Chat  
 ![Chat](./screenshots/chat.jpg)
 
-### 9. ✏️ Edit Profile  
+### 7. ✏️ Edit Profile  
 ![Edit Profile](./screenshots/edit.jpg)
 
-### 10. 👤 User Registration  
+### 8. 👤 User Registration  
 ![User Registration](./screenshots/reg.jpg)
 
-### 11. 🔐 Login Page  
+### 9. 🔐 Login Page  
 ![Login Page](./screenshots/login.jpg)
 
 
