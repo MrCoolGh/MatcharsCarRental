@@ -5,6 +5,7 @@
 
 ## 📌 Project Overview
 
+
 **Matchars Car Rental System** is a web-based application designed to streamline the process of renting vehicles. Developed as part of the **DCIT 208 – Software Engineering** course at the **University of Ghana**, this project involves delivering a real software solution to a real-world client.
 
 The system offers users the ability to view available cars, register, make bookings, and receive confirmations, while admins can manage cars, customers, and rental data securely.
