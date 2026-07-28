@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Traffic Light – AI Agents Demo | Group 1</title>
+  <style>
+    /* ── reset & base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    h1, h2, h3 { font-weight: 700; }
+    a { color: #58a6ff; }
+
+    /* ── header ───────────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+      border-bottom: 2px solid #21262d;
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+    header h1 { font-size: 1.8rem; color: #f0f6fc; }
+    header p  { color: #8b949e; margin-top: .4rem; font-size: .95rem; }
+
+    /* ── tabs ─────────────────────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: .5rem;
+      padding: 1rem 2rem .5rem;
+      border-bottom: 1px solid #21262d;
+      overflow-x: auto;
+      background: #161b22;
+    }
+    .tab-btn {
+      padding: .5rem 1.2rem;
+      border-radius: 6px 6px 0 0;
+      border: 1px solid #30363d;
+      background: #21262d;
+      color: #8b949e;
+      cursor: pointer;
+      font-size: .9rem;
+      white-space: nowrap;
+      transition: background .2s, color .2s;
+    }
+    .tab-btn.active {
+      background: #1f6feb;
+      color: #fff;
+      border-color: #1f6feb;
+    }
+    .tab-btn:hover:not(.active) { background: #30363d; color: #e0e0e0; }
+
+    /* ── content panels ───────────────────────────────────────────── */
+    .tab-panel { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+    .tab-panel.active { display: block; }
+
+    /* ── card ─────────────────────────────────────────────────────── */
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1.1rem; color: #58a6ff; margin-bottom: .8rem; }
+    .card p, .card li { color: #8b949e; line-height: 1.7; font-size: .93rem; }
+    .card ul { padding-left: 1.3rem; }
+
+    /* ── intersection visualiser ──────────────────────────────────── */
+    .intersection-wrap { display: flex; justify-content: center; margin: 1.5rem 0; }
+    .intersection {
+      display: grid;
+      grid-template-areas:
+        ". north ."
+        "west center east"
+        ". south .";
+      gap: 6px;
+      width: 320px;
+    }
+    .lane {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: .8rem .5rem;
+      border-radius: 8px;
+      background: #21262d;
+      border: 2px solid #30363d;
+      transition: background .3s, border-color .3s;
+      min-width: 80px;
+    }
+    .lane.green  { background: #0c3a1e; border-color: #3fb950; }
+    .lane.red    { background: #3a0c0c; border-color: #f85149; }
+    .lane.yellow { background: #3a3000; border-color: #d29922; }
+    .lane.emergency { background: #2d1b69; border-color: #a371f7; }
+    .lane-north  { grid-area: north; }
+    .lane-south  { grid-area: south; }
+    .lane-east   { grid-area: east;  }
+    .lane-west   { grid-area: west;  }
+    .lane-center { grid-area: center; background: #21262d; border: 2px solid #30363d;
+                   border-radius: 50%; width: 60px; height: 60px; display: flex;
+                   align-items: center; justify-content: center; font-size: 1.4rem; }
+    .lane-label  { font-size: .75rem; color: #8b949e; font-weight: 600;
+                   text-transform: uppercase; letter-spacing: .05em; }
+    .vehicle-count { font-size: 1.3rem; font-weight: 700; color: #e0e0e0; }
+    .signal {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #30363d;
+      box-shadow: 0 0 0 2px #21262d;
+    }
+    .signal.green  { background: #3fb950; box-shadow: 0 0 8px #3fb950; }
+    .signal.red    { background: #f85149; box-shadow: 0 0 8px #f85149; }
+    .signal.yellow { background: #d29922; box-shadow: 0 0 8px #d29922; }
+
+    /* ── controls ─────────────────────────────────────────────────── */
+    .controls {
+      display: flex;
+      gap: .8rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .btn {
+      padding: .5rem 1.2rem;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      background: #21262d;
+      color: #e0e0e0;
+      cursor: pointer;
+      font-size: .9rem;
+      transition: background .2s;
+    }
+    .btn:hover { background: #30363d; }
+    .btn.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+    .btn.primary:hover { background: #388bfd; }
+    .btn.danger  { background: #da3633; border-color: #da3633; color: #fff; }
+    .btn.danger:hover  { background: #f85149; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .badge {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+      background: #1f6feb22;
+      color: #58a6ff;
+      border: 1px solid #1f6feb55;
+    }
+    .badge.green     { background: #3fb95022; color: #3fb950; border-color: #3fb95055; }
+    .badge.red       { background: #f8514922; color: #f85149; border-color: #f8514955; }
+    .badge.yellow    { background: #d2992222; color: #d29922; border-color: #d2992255; }
+    .badge.emergency { background: #a371f722; color: #a371f7; border-color: #a371f755; }
+    .badge.pedestrian{ background: #58a6ff22; color: #58a6ff; border-color: #58a6ff55; }
+
+    /* ── log ──────────────────────────────────────────────────────── */
+    .log {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: .82rem;
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 1rem;
+      max-height: 260px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+    .log .log-step  { color: #58a6ff; }
+    .log .log-action{ color: #3fb950; }
+    .log .log-util  { color: #d29922; }
+    .log .log-emg   { color: #a371f7; }
+    .log .log-ped   { color: #79c0ff; }
+    .log .log-info  { color: #8b949e; }
+
+    /* ── percept sliders ──────────────────────────────────────────── */
+    .percept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .percept-card {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .percept-card h4 {
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #8b949e;
+      margin-bottom: .7rem;
+    }
+    .percept-card label { font-size: .82rem; color: #8b949e; display: block; margin-top: .5rem; }
+    .percept-card input[type=range] { width: 100%; accent-color: #1f6feb; }
+    .percept-card .val { color: #e0e0e0; font-weight: 600; }
+    .percept-card .checks { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .5rem; }
+    .percept-card .checks label {
+      display: flex; align-items: center; gap: .3rem;
+      font-size: .82rem; color: #8b949e; cursor: pointer;
+    }
+
+    /* ── code block ───────────────────────────────────────────────── */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: .82rem;
+      line-height: 1.7;
+      color: #e0e0e0;
+    }
+    .code-block .kw  { color: #ff7b72; }
+    .code-block .com { color: #8b949e; }
+    .code-block .str { color: #a5d6ff; }
+    .code-block .num { color: #79c0ff; }
+    .code-block .pred{ color: #d2a8ff; }
+    .code-block .var { color: #f0f6fc; }
+
+    /* ── utility bar chart ────────────────────────────────────────── */
+    .util-bars { display: flex; flex-direction: column; gap: .5rem; margin-top: .8rem; }
+    .util-row  { display: flex; align-items: center; gap: .8rem; }
+    .util-row .dir-lbl { width: 100px; font-size: .82rem; color: #8b949e; }
+    .util-bar-bg { flex: 1; background: #21262d; border-radius: 4px; height: 20px; overflow: hidden; }
+    .util-bar    { height: 100%; background: #1f6feb; border-radius: 4px;
+                   transition: width .4s ease; min-width: 2px; }
+    .util-val    { width: 50px; text-align: right; font-size: .82rem;
+                   font-weight: 600; color: #58a6ff; }
+
+    /* ── step info ────────────────────────────────────────────────── */
+    .step-info { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+                 margin-bottom: 1rem; }
+    .step-info span { font-size: .9rem; }
+
+    /* ── responsive ───────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.3rem; }
+      .intersection { width: 260px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════════════ -->
+<header>
+  <h1>🚦 Smart Traffic Light – AI Agents</h1>
+  <p>Group 1 &nbsp;|&nbsp; DCIT Intelligent Agents Assignment &nbsp;|&nbsp;
+     Implemented in <strong>Prolog</strong> (logic) + interactive JavaScript demo</p>
+</header>
+
+<!-- ═══════════════════════════ TABS ═════════════════════════════════════ -->
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" onclick="showTab('overview',event)"  >Overview</button>
+  <button class="tab-btn"        onclick="showTab('simple',event)"    >① Simple Reflex</button>
+  <button class="tab-btn"        onclick="showTab('modelbased',event)">② Model-Based</button>
+  <button class="tab-btn"        onclick="showTab('goal',event)"      >③ Goal-Based</button>
+  <button class="tab-btn"        onclick="showTab('utility',event)"   >④ Utility-Based</button>
+  <button class="tab-btn"        onclick="showTab('prolog',event)"    >Prolog Code</button>
+</nav>
+
+<!-- ═══════════════════════════ OVERVIEW ════════════════════════════════ -->
+<section id="tab-overview" class="tab-panel active">
+  <div class="card">
+    <h2>Environment: Four-Way Smart Intersection</h2>
+    <p>
+      The intersection has four approach lanes (<em>North, South, East, West</em>).
+      Each lane provides a <strong>percept</strong> containing:
+    </p>
+    <ul style="margin:.6rem 0 .6rem 1.3rem">
+      <li><strong>Vehicle count</strong> – number of vehicles queued</li>
+      <li><strong>Pedestrian button</strong> – whether a pedestrian has pressed the crossing button</li>
+      <li><strong>Emergency vehicle</strong> – whether an ambulance / fire engine is detected</li>
+    </ul>
+    <p>
+      The traffic-light controller (the <em>agent</em>) must decide every time-step
+      which direction to give a <span class="badge green">GREEN</span> signal,
+      while keeping all others <span class="badge red">RED</span>.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Four Agent Types Compared</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:.88rem">
+      <thead>
+        <tr style="border-bottom:1px solid #30363d">
+          <th style="text-align:left;padding:.5rem .8rem;color:#58a6ff">Agent</th>
+          <th style="text-align:left;padding:.5rem .8rem;color:#58a6ff">Memory?</th>
+          <th style="text-align:left;padding:.5rem .8rem;color:#58a6ff">Planning?</th>
+          <th style="text-align:left;padding:.5rem .8rem;color:#58a6ff">Trade-off Reasoning?</th>
+          <th style="text-align:left;padding:.5rem .8rem;color:#58a6ff">Key Strength</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #21262d">
+          <td style="padding:.5rem .8rem">① Simple Reflex</td>
+          <td style="padding:.5rem .8rem"><span class="badge red">No</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge red">No</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge red">No</span></td>
+          <td style="padding:.5rem .8rem;color:#8b949e">Simplest – fast, transparent rules</td>
+        </tr>
+        <tr style="border-bottom:1px solid #21262d">
+          <td style="padding:.5rem .8rem">② Model-Based</td>
+          <td style="padding:.5rem .8rem"><span class="badge green">Yes</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge red">No</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge red">No</span></td>
+          <td style="padding:.5rem .8rem;color:#8b949e">Remembers phase history → prevents starvation</td>
+        </tr>
+        <tr style="border-bottom:1px solid #21262d">
+          <td style="padding:.5rem .8rem">③ Goal-Based</td>
+          <td style="padding:.5rem .8rem"><span class="badge green">Yes</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge green">Yes</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge red">No</span></td>
+          <td style="padding:.5rem .8rem;color:#8b949e">Guarantees no direction exceeds wait threshold</td>
+        </tr>
+        <tr>
+          <td style="padding:.5rem .8rem">④ Utility-Based</td>
+          <td style="padding:.5rem .8rem"><span class="badge green">Yes</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge green">Yes</span></td>
+          <td style="padding:.5rem .8rem"><span class="badge green">Yes</span></td>
+          <td style="padding:.5rem .8rem;color:#8b949e">Maximises a weighted score → best overall performance</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SIMPLE REFLEX ════════════════════════════ -->
+<section id="tab-simple" class="tab-panel">
+  <div class="card">
+    <h2>① Simple Reflex Agent</h2>
+    <p>
+      Uses only <strong>IF–THEN condition-action rules</strong>.
+      It looks at the <em>current percept only</em> – there is no memory.
+      Each decision is independent of every prior step.
+    </p>
+    <ul style="margin:.6rem 0">
+      <li>Rule 1 – Emergency detected → <span class="badge emergency">emergency_override</span></li>
+      <li>Rule 2 – Pedestrian button pressed → <span class="badge pedestrian">pedestrian_signal</span></li>
+      <li>Rule 3 – Vehicles waiting → <span class="badge green">set_green(direction)</span></li>
+      <li>Rule 4 – Empty lane → <span class="badge red">set_red(direction)</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Interactive Demo</h2>
+    <p style="font-size:.85rem;color:#8b949e;margin-bottom:1rem">
+      Set one percept below, then click <strong>Run Agent</strong> to see the decision.
+    </p>
+    <div class="percept-grid" id="simple-percepts">
+      <!-- generated by JS -->
+    </div>
+    <div class="controls">
+      <button class="btn primary" onclick="runSimple()">▶ Run Agent</button>
+      <button class="btn" onclick="clearLog('simple-log')">Clear Log</button>
+    </div>
+    <div id="simple-result" style="margin-bottom:1rem"></div>
+    <div class="log" id="simple-log"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ MODEL-BASED ══════════════════════════════ -->
+<section id="tab-modelbased" class="tab-panel">
+  <div class="card">
+    <h2>② Model-Based Reflex Agent</h2>
+    <p>
+      Maintains an <strong>internal state</strong> (model of the world) across time-steps:
+      current green direction, phase timer, and accumulated wait counts.
+      It combines the current percept with this stored model to decide.
+    </p>
+    <ul style="margin:.6rem 0">
+      <li>Remembers <em>which direction is currently green</em> and for how long</li>
+      <li>Enforces a minimum green phase (10 steps) to avoid rapid flickering</li>
+      <li>Forces a phase change after a maximum (30 steps) to prevent monopolisation</li>
+      <li>Switches to the <em>most congested waiting direction</em> when the phase ends</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Interactive Demo</h2>
+    <div class="step-info">
+      <span>Step: <strong id="mb-step">0</strong></span>
+      <span>Current green: <strong id="mb-green">—</strong></span>
+      <span>Phase timer: <strong id="mb-timer">0</strong></span>
+    </div>
+    <div class="percept-grid" id="mb-percepts"></div>
+    <div class="controls">
+      <button class="btn primary" onclick="runModelBased()">▶ Step</button>
+      <button class="btn danger"  onclick="resetModelBased()">↺ Reset</button>
+      <button class="btn" onclick="clearLog('mb-log')">Clear Log</button>
+    </div>
+    <div class="intersection-wrap"><div class="intersection" id="mb-intersection"></div></div>
+    <div class="log" id="mb-log"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ GOAL-BASED ═══════════════════════════════ -->
+<section id="tab-goal" class="tab-panel">
+  <div class="card">
+    <h2>③ Goal-Based Agent</h2>
+    <p>
+      Acts to <strong>achieve a defined goal</strong>:
+      <em>"No direction should wait more than 20 steps without receiving a green phase."</em>
+      It builds a <strong>plan</strong> (ordered list of green phases) that satisfies this
+      goal and executes one step of the plan per cycle.
+    </p>
+    <ul style="margin:.6rem 0">
+      <li>Directions approaching the threshold are promoted to the front of the plan</li>
+      <li>Goal is checked every step and violations are flagged</li>
+      <li>Plan is rebuilt whenever it becomes empty or a direction is at risk</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Interactive Demo</h2>
+    <div class="step-info">
+      <span>Step: <strong id="goal-step">0</strong></span>
+      <span>Current green: <strong id="goal-green">—</strong></span>
+      <span id="goal-status" style="color:#3fb950">✔ Goal satisfied</span>
+    </div>
+    <div class="percept-grid" id="goal-percepts"></div>
+    <div class="controls">
+      <button class="btn primary" onclick="runGoal()">▶ Step</button>
+      <button class="btn danger"  onclick="resetGoal()">↺ Reset</button>
+      <button class="btn" onclick="clearLog('goal-log')">Clear Log</button>
+    </div>
+    <div class="intersection-wrap"><div class="intersection" id="goal-intersection"></div></div>
+    <div id="goal-wait-bars" class="util-bars"></div>
+    <br>
+    <div class="log" id="goal-log"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ UTILITY-BASED ════════════════════════════ -->
+<section id="tab-utility" class="tab-panel">
+  <div class="card">
+    <h2>④ Utility-Based Agent</h2>
+    <p>
+      Assigns a <strong>numerical utility score</strong> to every possible action and
+      selects the one with the <strong>highest utility</strong>.  This allows it to
+      balance competing objectives automatically.
+    </p>
+    <ul style="margin:.6rem 0">
+      <li><strong>Throughput</strong> (×3) – vehicles that can be cleared</li>
+      <li><strong>Fairness</strong> (×2) – how long the direction has been waiting</li>
+      <li><strong>Emergency bonus</strong> (+100) – urgent override</li>
+      <li><strong>Pedestrian bonus</strong> (+50) – safety</li>
+      <li><strong>Phase-change cost</strong> (−5) – penalise premature switching</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Interactive Demo</h2>
+    <div class="step-info">
+      <span>Step: <strong id="util-step">0</strong></span>
+      <span>Current green: <strong id="util-green">—</strong></span>
+    </div>
+    <div class="percept-grid" id="util-percepts"></div>
+    <div class="controls">
+      <button class="btn primary" onclick="runUtility()">▶ Step</button>
+      <button class="btn danger"  onclick="resetUtility()">↺ Reset</button>
+      <button class="btn" onclick="clearLog('util-log')">Clear Log</button>
+    </div>
+    <div class="intersection-wrap"><div class="intersection" id="util-intersection"></div></div>
+    <h3 style="font-size:.9rem;color:#8b949e;margin-bottom:.5rem">Utility Scores for Candidate Actions</h3>
+    <div id="util-bars" class="util-bars"></div>
+    <br>
+    <div class="log" id="util-log"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ PROLOG CODE ══════════════════════════════ -->
+<section id="tab-prolog" class="tab-panel">
+  <div class="card">
+    <h2>Prolog Source Files</h2>
+    <p>
+      The canonical implementations are in the <code>agents/</code> directory of this
+      repository.  Key excerpts are shown below for the presentation.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>agents/simple_reflex_agent.pl</h2>
+    <pre class="code-block"><span class="com">% RULE 1 – Emergency override (highest priority)</span>
+<span class="pred">decide_action</span>(<span class="pred">percept</span>(<span class="var">Dir</span>, <span class="var">_Count</span>, <span class="var">_Ped</span>, <span class="kw">true</span>), <span class="pred">emergency_override</span>(<span class="var">Dir</span>)).
+
+<span class="com">% RULE 2 – Pedestrian crossing</span>
+<span class="pred">decide_action</span>(<span class="pred">percept</span>(<span class="var">_Dir</span>, <span class="var">_Count</span>, <span class="kw">true</span>, <span class="kw">false</span>), <span class="pred">pedestrian_signal</span>).
+
+<span class="com">% RULE 3 – Give green to a busy lane</span>
+<span class="pred">decide_action</span>(<span class="pred">percept</span>(<span class="var">Dir</span>, <span class="var">Count</span>, <span class="kw">false</span>, <span class="kw">false</span>), <span class="pred">set_green</span>(<span class="var">Dir</span>)) :-
+    <span class="var">Count</span> <span class="kw">&gt;</span> <span class="num">0</span>.
+
+<span class="com">% RULE 4 – Empty lane → set red</span>
+<span class="pred">decide_action</span>(<span class="pred">percept</span>(<span class="var">Dir</span>, <span class="num">0</span>, <span class="kw">false</span>, <span class="kw">false</span>), <span class="pred">set_red</span>(<span class="var">Dir</span>)).</pre>
+  </div>
+
+  <div class="card">
+    <h2>agents/model_based_agent.pl – key clause</h2>
+    <pre class="code-block"><span class="com">% Dynamic state</span>
+<span class="kw">:- dynamic</span> <span class="pred">current_green</span>/<span class="num">1</span>.
+<span class="kw">:- dynamic</span> <span class="pred">phase_timer</span>/<span class="num">1</span>.
+<span class="kw">:- dynamic</span> <span class="pred">wait_count</span>/<span class="num">2</span>.
+
+<span class="com">% Switch to most congested direction when min phase elapsed</span>
+<span class="pred">decide_action</span>(<span class="pred">percept</span>(<span class="var">_</span>, <span class="var">_</span>, <span class="kw">false</span>, <span class="kw">false</span>), <span class="pred">set_green</span>(<span class="var">Best</span>)) :-
+    <span class="pred">current_green</span>(<span class="var">CG</span>),
+    <span class="pred">phase_timer</span>(<span class="var">T</span>), <span class="pred">min_green_steps</span>(<span class="var">Min</span>), <span class="var">T</span> <span class="kw">&gt;=</span> <span class="var">Min</span>,
+    <span class="pred">most_congested_excluding</span>(<span class="var">CG</span>, <span class="var">Best</span>),
+    <span class="kw">retractall</span>(<span class="pred">current_green</span>(<span class="var">_</span>)), <span class="kw">assert</span>(<span class="pred">current_green</span>(<span class="var">Best</span>)),
+    <span class="kw">retractall</span>(<span class="pred">phase_timer</span>(<span class="var">_</span>)),   <span class="kw">assert</span>(<span class="pred">phase_timer</span>(<span class="num">0</span>)).</pre>
+  </div>
+
+  <div class="card">
+    <h2>agents/goal_based_agent.pl – goal check &amp; planning</h2>
+    <pre class="code-block"><span class="com">% GOAL: no direction waits more than max_wait steps</span>
+<span class="pred">goal_satisfied</span> :-
+    <span class="pred">max_wait</span>(<span class="var">Max</span>),
+    <span class="kw">\+</span> (<span class="pred">waiting_time</span>(<span class="var">D</span>, <span class="var">W</span>), <span class="var">W</span> <span class="kw">&gt;</span> <span class="var">Max</span>).
+
+<span class="com">% Build plan: urgent directions come first</span>
+<span class="pred">build_plan</span> :-
+    <span class="pred">max_wait</span>(<span class="var">Max</span>),
+    <span class="var">Threshold</span> <span class="kw">is</span> <span class="var">Max</span> <span class="kw">//</span> <span class="num">2</span>,
+    <span class="pred">findall</span>(<span class="var">W</span><span class="kw">-</span><span class="var">D</span>, (<span class="pred">waiting_time</span>(<span class="var">D</span>, <span class="var">W</span>), <span class="var">W</span> <span class="kw">&gt;</span> <span class="var">Threshold</span>), <span class="var">Urgent</span>),
+    <span class="pred">sort</span>(<span class="num">0</span>, <span class="kw">@&gt;=</span>, <span class="var">Urgent</span>, <span class="var">Sorted</span>),
+    <span class="pred">pairs_values</span>(<span class="var">Sorted</span>, <span class="var">UrgentDirs</span>),
+    <span class="pred">findall</span>(<span class="var">D</span>, (<span class="pred">member</span>(<span class="var">D</span>, [north,south,east,west]),
+                 <span class="kw">\+</span> <span class="pred">member</span>(<span class="var">D</span>, <span class="var">UrgentDirs</span>)), <span class="var">OtherDirs</span>),
+    <span class="pred">append</span>(<span class="var">UrgentDirs</span>, <span class="var">OtherDirs</span>, <span class="var">NewPlan</span>),
+    <span class="kw">retractall</span>(<span class="pred">plan</span>(<span class="var">_</span>)), <span class="kw">assert</span>(<span class="pred">plan</span>(<span class="var">NewPlan</span>)).</pre>
+  </div>
+
+  <div class="card">
+    <h2>agents/utility_based_agent.pl – utility function</h2>
+    <pre class="code-block"><span class="com">% Utility weights</span>
+<span class="pred">weight_throughput</span>(<span class="num">3</span>).  <span class="pred">weight_fairness</span>(<span class="num">2</span>).
+<span class="pred">weight_emergency</span>(<span class="num">100</span>). <span class="pred">weight_pedestrian</span>(<span class="num">50</span>).
+<span class="pred">weight_phase_change</span>(<span class="kw">-</span><span class="num">5</span>).
+
+<span class="pred">compute_utility</span>(<span class="var">Percepts</span>, <span class="pred">set_green</span>(<span class="var">Dir</span>), <span class="var">Utility</span>) :-
+    <span class="pred">weight_throughput</span>(<span class="var">Wt</span>), <span class="pred">weight_fairness</span>(<span class="var">Wf</span>),
+    <span class="pred">weight_emergency</span>(<span class="var">We</span>),  <span class="pred">weight_phase_change</span>(<span class="var">Wpc</span>),
+    <span class="pred">member</span>(<span class="pred">percept</span>(<span class="var">Dir</span>, <span class="var">Count</span>, <span class="var">_</span>, <span class="var">_</span>), <span class="var">Percepts</span>),
+    <span class="var">Throughput</span> <span class="kw">is</span> <span class="var">Wt</span> <span class="kw">*</span> <span class="var">Count</span>,
+    <span class="pred">wait_time</span>(<span class="var">Dir</span>, <span class="var">WT</span>),
+    <span class="var">Fairness</span> <span class="kw">is</span> <span class="var">Wf</span> <span class="kw">*</span> <span class="var">WT</span>,
+    (<span class="pred">member</span>(<span class="pred">percept</span>(<span class="var">Dir</span>,<span class="var">_</span>,<span class="var">_</span>,<span class="kw">true</span>), <span class="var">Percepts</span>) <span class="kw">-&gt;</span> <span class="var">Emg</span> <span class="kw">=</span> <span class="var">We</span> <span class="kw">;</span> <span class="var">Emg</span> <span class="kw">=</span> <span class="num">0</span>),
+    (<span class="pred">current_green</span>(<span class="var">Dir</span>) <span class="kw">-&gt;</span> <span class="var">PC</span> <span class="kw">=</span> <span class="num">0</span> <span class="kw">;</span>
+        (<span class="pred">phase_timer</span>(<span class="var">T</span>), <span class="pred">min_green_steps</span>(<span class="var">Min</span>), <span class="var">T</span> <span class="kw">&lt;</span> <span class="var">Min</span> <span class="kw">-&gt;</span> <span class="var">PC</span> <span class="kw">=</span> <span class="var">Wpc</span> <span class="kw">;</span> <span class="var">PC</span> <span class="kw">=</span> <span class="num">0</span>)),
+    <span class="var">Utility</span> <span class="kw">is</span> <span class="var">Throughput</span> <span class="kw">+</span> <span class="var">Fairness</span> <span class="kw">+</span> <span class="var">Emg</span> <span class="kw">+</span> <span class="var">PC</span>.
+
+<span class="com">% Select the action with the maximum utility</span>
+<span class="pred">best_action</span>(<span class="var">Percepts</span>, <span class="var">BestAction</span>) :-
+    <span class="pred">candidate_actions</span>(<span class="var">Percepts</span>, <span class="var">Candidates</span>),
+    <span class="pred">maplist</span>(<span class="pred">scored_action</span>(<span class="var">Percepts</span>), <span class="var">Candidates</span>, <span class="var">Scored</span>),
+    <span class="pred">sort</span>(<span class="num">0</span>, <span class="kw">@&gt;=</span>, <span class="var">Scored</span>, [<span class="var">_Score</span><span class="kw">-</span><span class="var">BestAction</span> | <span class="var">_</span>]).</pre>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════════ -->
+<script>
+'use strict';
+
+// ── constants ──────────────────────────────────────────────────────────────
+const DIRS = ['north','south','east','west'];
+const MIN_GREEN = 8, MAX_GREEN = 30, MAX_WAIT = 20;
+
+// ── tab switching ──────────────────────────────────────────────────────────
+function showTab(id, event) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── percept UI builder ─────────────────────────────────────────────────────
+function buildPerceptUI(containerId, prefix) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  DIRS.forEach(dir => {
+    const card = document.createElement('div');
+    card.className = 'percept-card';
+    card.innerHTML = `
+      <h4>${dir}</h4>
+      <label>Vehicles: <span class="val" id="${prefix}-${dir}-vval">3</span></label>
+      <input type="range" id="${prefix}-${dir}-v" min="0" max="15" value="3"
+             oninput="document.getElementById('${prefix}-${dir}-vval').textContent=this.value">
+      <div class="checks">
+        <label><input type="checkbox" id="${prefix}-${dir}-ped"> 🚶 Pedestrian</label>
+        <label><input type="checkbox" id="${prefix}-${dir}-emg"> 🚑 Emergency</label>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function getPercepts(prefix) {
+  return DIRS.map(dir => ({
+    dir,
+    count: parseInt(document.getElementById(`${prefix}-${dir}-v`).value),
+    ped:   document.getElementById(`${prefix}-${dir}-ped`).checked,
+    emg:   document.getElementById(`${prefix}-${dir}-emg`).checked
+  }));
+}
+
+// ── intersection renderer ─────────────────────────────────────────────────
+function renderIntersection(containerId, percepts, greenDir, signal='green') {
+  const el = document.getElementById(containerId);
+  const sigMap = {north:'lane-north', south:'lane-south', east:'lane-east', west:'lane-west'};
+  el.innerHTML = `<div class="lane-center">🚦</div>`;
+  percepts.forEach(p => {
+    const isGreen = p.dir === greenDir;
+    const isEmg   = p.emg;
+    const cls = isEmg ? 'emergency' : (isGreen ? signal : 'red');
+    const sig = isGreen ? signal : 'red';
+    el.innerHTML += `
+      <div class="lane ${sigMap[p.dir]} ${cls}">
+        <div class="lane-label">${p.dir}</div>
+        <div class="vehicle-count">${p.count}</div>
+        <div class="signal ${sig}"></div>
+      </div>`;
+  });
+}
+
+// ── log helper ─────────────────────────────────────────────────────────────
+function appendLog(logId, html) {
+  const log = document.getElementById(logId);
+  log.innerHTML += html + '<br>';
+  log.scrollTop = log.scrollHeight;
+}
+function clearLog(id) { document.getElementById(id).innerHTML = ''; }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ① SIMPLE REFLEX AGENT
+// ══════════════════════════════════════════════════════════════════════════
+function simpleReflexDecide(p) {
+  if (p.emg)             return { action: `emergency_override(${p.dir})`, type:'emg'  };
+  if (p.ped)             return { action: 'pedestrian_signal',             type:'ped'  };
+  if (p.count > 0)       return { action: `set_green(${p.dir})`,          type:'green'};
+  return                        { action: `set_red(${p.dir})`,             type:'red'  };
+}
+
+(function initSimple() {
+  buildPerceptUI('simple-percepts', 'sra');
+})();
+
+function runSimple() {
+  const percepts = getPercepts('sra');
+  const results  = percepts.map(simpleReflexDecide);
+  appendLog('simple-log',
+    `<span class="log-step">[Simple Reflex]</span> Percepts → Actions:`);
+  percepts.forEach((p, i) => {
+    const r = results[i];
+    appendLog('simple-log',
+      `  ${p.dir.padEnd(6)} v=${p.count} ped=${p.ped?'Y':'N'} emg=${p.emg?'Y':'N'} ` +
+      `<span class="log-action">→ ${r.action}</span>`);
+  });
+  // Show the first triggered action prominently
+  const first = results.find(r => r.type !== 'red') || results[0];
+  const matchDir = first.action.match(/\((\w+)\)/);
+  const greenDir = matchDir ? matchDir[1] : null;
+  renderIntersection('simple-result', percepts, greenDir);
+  document.getElementById('simple-result').style.marginBottom = '1rem';
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ② MODEL-BASED REFLEX AGENT
+// ══════════════════════════════════════════════════════════════════════════
+let mbState = null;
+function resetMbState() {
+  mbState = {
+    currentGreen: null,
+    phaseTimer: 0,
+    waitCount: { north:0, south:0, east:0, west:0 },
+    step: 0
+  };
+  document.getElementById('mb-step').textContent  = '0';
+  document.getElementById('mb-green').textContent = '—';
+  document.getElementById('mb-timer').textContent = '0';
+  document.getElementById('mb-intersection').innerHTML = '';
+  clearLog('mb-log');
+}
+(function initMB() {
+  buildPerceptUI('mb-percepts', 'mb');
+  resetMbState();
+})();
+function resetModelBased() { resetMbState(); }
+
+function runModelBased() {
+  const percepts = getPercepts('mb');
+  mbState.step++;
+
+  // Emergency override
+  const emgP = percepts.find(p => p.emg);
+  if (emgP) {
+    mbState.currentGreen = emgP.dir;
+    mbState.phaseTimer   = 0;
+    const action = `emergency_override(${emgP.dir})`;
+    updateMbUI(percepts, action, emgP.dir, 'emergency');
+    return;
+  }
+  // Pedestrian
+  const pedP = percepts.find(p => p.ped);
+  if (pedP) {
+    updateMbUI(percepts, 'pedestrian_signal', null, 'green');
+    return;
+  }
+
+  // Update wait counts
+  DIRS.forEach(dir => {
+    const p = percepts.find(x => x.dir === dir);
+    if (p.count > 0 && dir !== mbState.currentGreen)
+      mbState.waitCount[dir] += p.count;
+  });
+  mbState.phaseTimer++;
+
+  let action;
+  if (mbState.currentGreen && mbState.phaseTimer < MIN_GREEN) {
+    action = `keep_green(${mbState.currentGreen})`;
+  } else if (mbState.phaseTimer >= MAX_GREEN) {
+    // force cycle
+    const order = ['north','east','south','west'];
+    const idx   = (order.indexOf(mbState.currentGreen) + 1) % 4;
+    mbState.currentGreen = order[idx];
+    mbState.phaseTimer   = 0;
+    action = `cycle_next → set_green(${mbState.currentGreen})`;
+  } else {
+    // switch to most congested
+    const best = DIRS.filter(d => d !== mbState.currentGreen)
+                     .sort((a,b) => mbState.waitCount[b] - mbState.waitCount[a])[0];
+    if (best && (mbState.waitCount[best] > 0 || !mbState.currentGreen)) {
+      mbState.waitCount[best] = 0;
+      mbState.currentGreen    = best;
+      mbState.phaseTimer      = 0;
+      action = `set_green(${best})`;
+    } else {
+      action = mbState.currentGreen ? `keep_green(${mbState.currentGreen})` : 'all_red';
+    }
+  }
+  updateMbUI(percepts, action, mbState.currentGreen, 'green');
+}
+
+function updateMbUI(percepts, action, greenDir, sig) {
+  document.getElementById('mb-step').textContent  = mbState.step;
+  document.getElementById('mb-green').textContent = greenDir || '—';
+  document.getElementById('mb-timer').textContent = mbState.phaseTimer;
+  renderIntersection('mb-intersection', percepts, greenDir, sig);
+  appendLog('mb-log',
+    `<span class="log-step">Step ${mbState.step}</span> ` +
+    `<span class="log-action">→ ${action}</span> ` +
+    `<span class="log-info">(timer=${mbState.phaseTimer})</span>`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ③ GOAL-BASED AGENT
+// ══════════════════════════════════════════════════════════════════════════
+let goalState = null;
+function resetGoalState() {
+  goalState = {
+    currentGreen: null,
+    phaseTimer: 0,
+    waitTime: { north:0, south:0, east:0, west:0 },
+    plan: [],
+    step: 0
+  };
+  document.getElementById('goal-step').textContent  = '0';
+  document.getElementById('goal-green').textContent = '—';
+  document.getElementById('goal-status').textContent = '✔ Goal satisfied';
+  document.getElementById('goal-status').style.color = '#3fb950';
+  document.getElementById('goal-intersection').innerHTML = '';
+  document.getElementById('goal-wait-bars').innerHTML = '';
+  clearLog('goal-log');
+}
+(function initGoal() {
+  buildPerceptUI('goal-percepts', 'goal');
+  resetGoalState();
+})();
+function resetGoal() { resetGoalState(); }
+
+function goalBuildPlan() {
+  const threshold = MAX_WAIT / 2;
+  const urgent = DIRS
+    .filter(d => goalState.waitTime[d] > threshold)
+    .sort((a,b) => goalState.waitTime[b] - goalState.waitTime[a]);
+  const others = DIRS.filter(d => !urgent.includes(d));
+  goalState.plan = [...urgent, ...others];
+}
+
+function runGoal() {
+  const percepts = getPercepts('goal');
+  goalState.step++;
+
+  const emgP = percepts.find(p => p.emg);
+  const pedP = percepts.find(p => p.ped);
+  let action, greenDir;
+
+  if (emgP) {
+    action   = `emergency_override(${emgP.dir})`;
+    greenDir = emgP.dir;
+  } else if (pedP) {
+    action   = 'pedestrian_signal';
+    greenDir = goalState.currentGreen;
+  } else {
+    // update wait times
+    DIRS.forEach(dir => {
+      const p = percepts.find(x => x.dir === dir);
+      if (dir === goalState.currentGreen) {
+        goalState.waitTime[dir] = 0;
+      } else if (p.count > 0) {
+        goalState.waitTime[dir]++;
+      } else {
+        goalState.waitTime[dir] = 0;
+      }
+    });
+    goalState.phaseTimer++;
+
+    if (goalState.plan.length === 0) goalBuildPlan();
+
+    if (goalState.currentGreen && goalState.phaseTimer < MIN_GREEN) {
+      action   = `keep_green(${goalState.currentGreen})`;
+      greenDir = goalState.currentGreen;
+    } else {
+      const next = goalState.plan.shift() || DIRS[0];
+      goalState.currentGreen = next;
+      goalState.phaseTimer   = 0;
+      action   = `set_green(${next})`;
+      greenDir = next;
+    }
+  }
+
+  // Check goal
+  const violated = DIRS.filter(d => goalState.waitTime[d] > MAX_WAIT);
+  const goalOk   = violated.length === 0;
+  const statusEl = document.getElementById('goal-status');
+  if (goalOk) {
+    statusEl.textContent = '✔ Goal satisfied';
+    statusEl.style.color = '#3fb950';
+  } else {
+    statusEl.textContent = `✘ GOAL VIOLATED: ${violated.join(', ')} exceeded wait limit`;
+    statusEl.style.color = '#f85149';
+  }
+
+  document.getElementById('goal-step').textContent  = goalState.step;
+  document.getElementById('goal-green').textContent = greenDir || '—';
+  renderIntersection('goal-intersection', percepts, greenDir, 'green');
+
+  // Render wait bars
+  const maxW = Math.max(...Object.values(goalState.waitTime), 1);
+  const barsHtml = DIRS.map(d => {
+    const w   = goalState.waitTime[d];
+    const pct = Math.round(w / MAX_WAIT * 100);
+    const col = w > MAX_WAIT ? '#f85149' : (w > MAX_WAIT/2 ? '#d29922' : '#1f6feb');
+    return `<div class="util-row">
+      <div class="dir-lbl">${d}</div>
+      <div class="util-bar-bg">
+        <div class="util-bar" style="width:${Math.min(pct,100)}%;background:${col}"></div>
+      </div>
+      <div class="util-val">${w}/${MAX_WAIT}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('goal-wait-bars').innerHTML =
+    `<p style="font-size:.82rem;color:#8b949e;margin-bottom:.5rem">Wait times (threshold = ${MAX_WAIT} steps)</p>` + barsHtml;
+
+  appendLog('goal-log',
+    `<span class="log-step">Step ${goalState.step}</span> ` +
+    `<span class="log-action">→ ${action}</span> ` +
+    `<span class="log-info">waits: ${DIRS.map(d=>d+'='+goalState.waitTime[d]).join(' ')}</span>`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  ④ UTILITY-BASED AGENT
+// ══════════════════════════════════════════════════════════════════════════
+const W_THROUGHPUT    = 3;
+const W_FAIRNESS      = 2;
+const W_EMERGENCY     = 100;
+const W_PEDESTRIAN    = 50;
+const W_PHASE_CHANGE  = -5;
+
+let utilState = null;
+function resetUtilState() {
+  utilState = {
+    currentGreen: null,
+    phaseTimer: 0,
+    waitTime: { north:0, south:0, east:0, west:0 },
+    step: 0
+  };
+  document.getElementById('util-step').textContent  = '0';
+  document.getElementById('util-green').textContent = '—';
+  document.getElementById('util-intersection').innerHTML = '';
+  document.getElementById('util-bars').innerHTML = '';
+  clearLog('util-log');
+}
+(function initUtil() {
+  buildPerceptUI('util-percepts', 'ub');
+  resetUtilState();
+})();
+function resetUtility() { resetUtilState(); }
+
+function computeUtility(percepts, action) {
+  if (action.type === 'emergency') return W_EMERGENCY;
+  if (action.type === 'pedestrian') return W_PEDESTRIAN;
+  const dir = action.dir;
+  const p   = percepts.find(x => x.dir === dir);
+  if (!p) return 0;
+  const throughput   = W_THROUGHPUT * p.count;
+  const fairness     = W_FAIRNESS   * (utilState.waitTime[dir] || 0);
+  const emergency    = p.emg ? W_EMERGENCY : 0;
+  const phaseChange  = (utilState.currentGreen !== dir &&
+                        utilState.phaseTimer < MIN_GREEN) ? W_PHASE_CHANGE : 0;
+  return throughput + fairness + emergency + phaseChange;
+}
+
+function runUtility() {
+  const percepts = getPercepts('ub');
+  utilState.step++;
+
+  // emergency / pedestrian shortcut
+  const emgP = percepts.find(p => p.emg);
+  const pedP = percepts.find(p => p.ped && !p.emg);
+
+  let bestAction, greenDir, barsData = [];
+
+  if (emgP) {
+    bestAction = `emergency_override(${emgP.dir})`;
+    greenDir   = emgP.dir;
+    barsData   = [{ label: bestAction, util: W_EMERGENCY }];
+  } else if (pedP) {
+    bestAction = 'pedestrian_signal';
+    greenDir   = utilState.currentGreen;
+    barsData   = [{ label: bestAction, util: W_PEDESTRIAN }];
+  } else {
+    // compute utility for each candidate
+    const candidates = DIRS
+      .filter(d => percepts.find(p => p.dir === d).count > 0)
+      .map(d => ({ type:'green', dir: d }));
+    if (utilState.currentGreen)
+      candidates.push({ type:'keep', dir: utilState.currentGreen });
+    if (candidates.length === 0)
+      candidates.push({ type:'red', dir: null });
+
+    barsData = candidates.map(a => {
+      const u = computeUtility(percepts, a);
+      const lbl = a.type === 'keep' ? `keep_green(${a.dir})` :
+                  a.type === 'red'  ? 'all_red' : `set_green(${a.dir})`;
+      return { label: lbl, util: u, dir: a.dir };
+    });
+    barsData.sort((a,b) => b.util - a.util);
+    const best = barsData[0];
+    bestAction = best.label;
+    greenDir   = best.dir;
+
+    // update wait times
+    DIRS.forEach(dir => {
+      const p = percepts.find(x => x.dir === dir);
+      if (dir === greenDir) utilState.waitTime[dir] = 0;
+      else if (p.count > 0) utilState.waitTime[dir]++;
+      else utilState.waitTime[dir] = 0;
+    });
+    utilState.phaseTimer++;
+    if (greenDir && greenDir !== utilState.currentGreen) {
+      utilState.currentGreen = greenDir;
+      utilState.phaseTimer   = 0;
+    }
+  }
+
+  document.getElementById('util-step').textContent  = utilState.step;
+  document.getElementById('util-green').textContent = greenDir || '—';
+  renderIntersection('util-intersection', percepts, greenDir, 'green');
+
+  // Render utility bars
+  const maxU = Math.max(...barsData.map(b => Math.abs(b.util)), 1);
+  const barsHtml = barsData.map((b, i) => {
+    const pct = Math.round(Math.abs(b.util) / maxU * 100);
+    const col = i === 0 ? '#3fb950' : '#1f6feb';
+    const bold = i === 0 ? 'font-weight:700;color:#3fb950' : '';
+    return `<div class="util-row">
+      <div class="dir-lbl" style="width:160px;${bold}">${b.label}</div>
+      <div class="util-bar-bg">
+        <div class="util-bar" style="width:${pct}%;background:${col}"></div>
+      </div>
+      <div class="util-val" style="${bold}">${b.util}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('util-bars').innerHTML = barsHtml;
+
+  appendLog('util-log',
+    `<span class="log-step">Step ${utilState.step}</span> ` +
+    barsData.map((b,i) =>
+      `<span class="${i===0?'log-action':'log-util'}">${b.label}=${b.util}</span>`
+    ).join(' | ') +
+    ` → <span class="log-action">BEST: ${bestAction}</span>`);
+}
+</script>
+</body>
+</html>
